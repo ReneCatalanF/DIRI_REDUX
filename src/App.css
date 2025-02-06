@@ -1,0 +1,76 @@
+/* Estilos generales */
+body {
+  font-family: sans-serif;
+  margin: 0;
+  background-color: #f0f0f0; /* Fondo gris claro */
+  display: flex; /* Para centrar verticalmente el contenido */
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.App {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  width: 90%;
+  max-width: 600px;
+  text-align: center; /* Centrar el texto dentro del contenedor principal */
+}
+
+/* Botón "Pedir Comida" */
+.toggleButton {
+  background-color: #e0e0e0; /* Gris claro */
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+/* Título principal */
+.title {
+  font-size: 1.6rem;
+  color: #333; /* Texto más oscuro */
+  margin-bottom: 10px;
+}
+
+/* Subtítulo "Menús" */
+.subTitle {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+/* Lista de menús */
+.ulApp {
+  list-style: none;
+  padding: 0;
+  display: grid; /* Usamos grid para un diseño más flexible */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Columnas responsive */
+  grid-gap: 20px; /* Espacio entre las tarjetas */
+}
+
+/* Elementos de la lista (tarjetas) */
+.liApp {
+  background-color: #fff; /* Fondo blanco para las tarjetas */
+  border: 1px solid #ddd; /* Borde gris claro */
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  text-align: left; /* Alinea el texto a la izquierda dentro de la tarjeta */
+  min-height: 80px; /* Altura minima para que todas las tarjetas tengan el mismo tamaño */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centra el contenido verticalmente */
+}
+
+.liApp p {
+  margin: 5px 0; /* Espacio entre los párrafos dentro de la tarjeta */
+}
+
+/* Estilo para el precio */
+.liApp p:last-child {
+  color: #4CAF50; /* Verde */
+}

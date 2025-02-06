@@ -1,0 +1,64 @@
+/* Keep the previous styles from your response */
+
+.food-order {
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 5px;
+  background-color: #f8f8f8;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.food-details {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.food-details h5,
+.food-details p {
+  margin: 0 5px;
+}
+
+.quantityInput {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.quantityInput label {
+  margin-right: 10px;
+}
+
+.number {
+  width: 50px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.orderButton {
+  background-color: #2d9cdb;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.backButton {
+  margin-top: 10px;
+  background-color: #e0e0e0;
+  color: #333;
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* New styles for the image */
+.foodImg {
+  width: 100px; /* Adjust width as needed */
+  height: auto; /* Maintain image aspect ratio */
+  margin-right: 20px; /* Add space between image and details */
+  border-radius: 5px; /* Add rounded corners */
+}
