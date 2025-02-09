@@ -1,21 +1,25 @@
-import { MouseEventHandler, useContext, useEffect, useState } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import { MenuItem, TimeData, Pedido } from '../entites/entities';
-import { foodItemsContext } from "../App";
+//import { foodItemsContext } from "../App";
 import './FoorOrder.css';
 import ima from '../images/Hamburg.jpg';
 import logger from "../services/logging";
 import fetchData from "../services/FetchTime";
 import { db } from "../services/FirebaseStorage";
 import { push, ref } from "firebase/database";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../features/store";
+import { actualizarCantidad } from "../features/sliceHamburguer";
 
 interface FoodOrderProps {
-    food: MenuItem;
+    food: number;
     onReturnToMenu: MouseEventHandler<HTMLButtonElement> | undefined;
 }
 function FoodOrder(props: FoodOrderProps) {
-    if (props.food.quantity <= 0) {
-        throw new Error('Ya no quedan hamburguesas ' + props.food.name + ' ,tenemos ' + props.food.quantity + ' ahora mismo');
-    }
+    
+
+
+    const dispatch = useDispatch<AppDispatch>();
 
     //Para traer la fecha actual
     const [timeData, setTimeData] = useState<TimeData | undefined>({ "timeZone": "", "dateTime": "" });
@@ -24,7 +28,11 @@ function FoodOrder(props: FoodOrderProps) {
     const [quantity, setQuantity] = useState(1);
     const [selectquantity, setSelectQuantity] = useState(0);
 
-    const menuItems: MenuItem[] = useContext(foodItemsContext)
+    const menuItems = useSelector((state: RootState) => state.storeComidaRapida.items);
+    const foodG = useSelector((state: RootState) => state.storeComidaRapida.items[props.food-1]);
+    if (foodG.quantity <= 0) {
+        throw new Error('Ya no quedan hamburguesas ' + foodG.name + ' ,tenemos ' + foodG.quantity + ' ahora mismo');
+    }
 
     const [isOrder, setisOrder] = useState<boolean | undefined>(undefined);
     const [excede, setExcede] = useState<boolean>(false);
@@ -34,26 +42,28 @@ function FoodOrder(props: FoodOrderProps) {
     const handleClick = async () => {
 
 
-        const itemEncontrado = menuItems.find((item: MenuItem) => item.id === props.food.id);
+        const itemEncontrado = menuItems.find((item: MenuItem) => item.id === foodG.id);
 
         if (itemEncontrado) {
             try {
                 setTimeData(await fetchData(_timeZone, setTimeData, setisOrder));
+                const idd = itemEncontrado.id;
+                const quantity2 = itemEncontrado.quantity - quantity;
+                console.log("ANTES DEL DISPATCH");
+                dispatch(actualizarCantidad({ id: idd, quantity: quantity2 }));
+                console.log("DESPUES DEL DISPATCH");
 
-                itemEncontrado.quantity = itemEncontrado.quantity - quantity;
 
-
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (error) {
-                logger.error("Error en fetchData: ");
+                logger.error("Error en fetchData: " + error);
                 return;
             }
         } else {
-            logger.warn("No se encontró el item con id: " + props.food.id);
+            logger.warn("No se encontró el item con id: " + foodG.id);
         }
-
-
     };
+
+
 
     const handleExcede = () => {
         logger.debug("Entendido el excede");
@@ -70,7 +80,7 @@ function FoodOrder(props: FoodOrderProps) {
 
         if (!isNaN(parsedQuantity)) { // Verifica si la conversión fue exitosa
 
-            if (parsedQuantity < props.food.quantity - 1) {
+            if (parsedQuantity < foodG.quantity - 1) {
                 //logger.info("Se convierte OK a numero: " + parsedQuantity + " y nuevo precio actualizado: " + props.food.price * parsedQuantity);
                 setSelectQuantity(0);
                 setExcede(false);
@@ -87,14 +97,15 @@ function FoodOrder(props: FoodOrderProps) {
         }
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const crearPedido = async () => {
         let pedido: Pedido | null = null;
         pedido = {
             "fecha": timeData!.dateTime.toString(),
-            "id_menu": props.food.id,
-            "nombre_menu": props.food.name,
+            "id_menu": foodG.id,
+            "nombre_menu": foodG.name,
             "cantidad": quantity,
-            "precio_total": (props.food.price * quantity)
+            "precio_total": (foodG.price * quantity)
         };
 
         if (pedido) {
@@ -104,24 +115,23 @@ function FoodOrder(props: FoodOrderProps) {
             //logger.info("Aqui esta el nuevo pedido: " + pedido.id_menu + " " + pedido.nombre_menu + " " + pedido.fecha + " " + pedido.cantidad + " " + pedido.precio_total);
         }
         //setExcede(false);
-
-
     }
 
 
     useEffect(() => {
         if (isOrder === false && timeData) {
-          async function realizarPedido() {
-            try {
-              await crearPedido();
-              setExcede(false);
-            } catch (error) {
-              console.error('Error al crear pedido:', error);
+            async function realizarPedido() {
+                try {
+                    //await crearPedido();
+                    setExcede(false);
+                } catch (error) {
+                    console.error('Error al crear pedido:', error);
+                }
             }
-          }
-          realizarPedido();
+            realizarPedido();
         }
-      }, [crearPedido, isOrder, timeData]);
+    }, [crearPedido, isOrder, timeData]);
+
 
     return (
         <>
@@ -129,8 +139,6 @@ function FoodOrder(props: FoodOrderProps) {
                 <p>Realizando petición de datos...</p>
             ) : isOrder === false && timeData ? (
                 <div>
-                    {//crearPedido();
-                    }
                     <h4>Pedido realizado</h4>
                     <p>Hora actual: {timeData.dateTime}</p>
                 </div>
@@ -140,7 +148,7 @@ function FoodOrder(props: FoodOrderProps) {
 
             {excede === true && (
                 <div>
-                    <h4>Excedes la cantidad total de hamburguesas que puedes pedir: {props.food.quantity - 1}
+                    <h4>Excedes la cantidad total de hamburguesas que puedes pedir: {foodG.quantity - 1}
                         y estas ingresando {selectquantity}</h4>
                     <button onClick={() =>
                         handleExcede()}>Entendido</button>
@@ -150,14 +158,14 @@ function FoodOrder(props: FoodOrderProps) {
                 <img
                     className="foodImg"
                     src={ima}
-                    alt={props.food.name}
+                    alt={foodG.name}
                 />
                 <h5>Nombre: </h5>
-                <p>{props.food.name}</p>
+                <p>{foodG.name}</p>
                 <h5>Precio: </h5>
-                <p>{props.food.price * quantity}</p>
+                <p>{foodG.price * quantity}</p>
                 <h5>Cantidad total que se puede pedir: </h5>
-                <p>{props.food.quantity - 1}</p>
+                <p>{foodG.quantity - 1}</p>
                 <br />
                 <div>
                     <label>Cantidad a ordenar: </label>

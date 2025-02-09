@@ -5,15 +5,20 @@ import ima from '../images/Hamburg.jpg';
 import { useState } from 'react';
 import ErrorBoundary from '../services/ErrorBoundaries'
 import logger from '../services/logging';
+import { useSelector } from 'react-redux';
+import { RootState } from '../features/store';
 
-interface FoodsProps {
-    foodItems: MenuItem[];
-}
-function Foods(props: FoodsProps) {
+/*interface FoodsProps {
+    //foodItems: MenuItem[];
+}*/
+function Foods() {
 
 
     const [foodOrder, setfoodOrder] = useState(false);
     const [foodSelect, setfoodSelect] = useState<MenuItem>();
+
+    const foodItems = useSelector((state: RootState) => state.storeComidaRapida.items);
+
     const handleReturnToMenu = () => {
         setfoodOrder(!foodOrder);
     };
@@ -30,7 +35,7 @@ function Foods(props: FoodsProps) {
                 <>
                     <h4 className="foodTitle">Choose from our Menu</h4>
                     <ul className="ulFoods">
-                        {props.foodItems.map((item) => {
+                        {foodItems.map((item: MenuItem) => {
                             return (
                                 <li key={item.id} className="liFoods"
                                     onClick={() =>
@@ -52,7 +57,7 @@ function Foods(props: FoodsProps) {
             )
             }
             {foodOrder && 
-            <ErrorBoundary fallback={<div>¡No nos quedan de esas hamburguesas!</div>}><FoodOrder food={foodSelect!} onReturnToMenu={handleReturnToMenu}></FoodOrder></ErrorBoundary>
+            <ErrorBoundary fallback={<div>¡No nos quedan de esas hamburguesas!</div>}><FoodOrder food={foodSelect!.id} onReturnToMenu={handleReturnToMenu}></FoodOrder></ErrorBoundary>
             
             
             }

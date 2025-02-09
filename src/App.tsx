@@ -1,14 +1,17 @@
 import { useState } from 'react'
-import { MenuItem } from './entites/entities';
+//import { MenuItem } from './entites/entities';
 import Foods from './components/Foods';
-import React from 'react';
+//import React from 'react';
 import './App.css'
+import { useSelector } from 'react-redux';
+import { RootState } from './features/store';
 
-export const foodItemsContext = React.createContext<MenuItem[]>([]);
+//export const foodItemsContext = React.createContext<MenuItem[]>([]);
 
 function App() {
   const [isChooseFoodPage, setIsChooseFoodPage] = useState(false);
 
+  /*
   const [menuItems] = useState<MenuItem[]>([
     {
       "id": 1,
@@ -43,9 +46,12 @@ function App() {
       "image": "Hamburg.jpg"
     },
   ]);
+  */
+
+  const menuItems = useSelector((state: RootState) => state.storeComidaRapida.items);
+  
 
   return (
-    <foodItemsContext.Provider value={menuItems}>
     <div className="App">
       <button className="toggleButton" onClick={() =>
         setIsChooseFoodPage(!isChooseFoodPage)}>
@@ -66,9 +72,8 @@ function App() {
           </ul>
         </>
       )}
-      {isChooseFoodPage && <Foods foodItems={menuItems}></Foods>}
+      {isChooseFoodPage && <Foods></Foods>}
     </div>
-    </foodItemsContext.Provider>
   )
 }
 
