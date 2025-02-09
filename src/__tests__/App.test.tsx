@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 //import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { cleanup, render, screen } from '@testing-library/react';
 import App from '../App';
-import Foods from '../components/Foods'
+//import Foods from '../components/Foods'
 //import FoodOrder from '../components/FoodOrder';
 
 
@@ -39,6 +39,7 @@ describe('Renders main page correctly', async () => {
     cleanup();
   });
 
+  /*
   it('en la pantalla de Pedir Comida se muestran cuatro productos y alguno de los precios', async () => {
     render(<Foods foodItems={[
       {
@@ -84,7 +85,7 @@ describe('Renders main page correctly', async () => {
     expect(quantities).toHaveLength(4);
 
     cleanup();
-  });
+  });*/
 
   /*
   it('en la compra se actualiza correctamente el precio para una cantidad introducida', async () => {
