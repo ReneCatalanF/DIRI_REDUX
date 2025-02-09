@@ -1,22 +1,23 @@
 import { MouseEventHandler, useEffect, useState } from "react";
-import { MenuItem, TimeData, Pedido } from '../entites/entities';
+//import { MenuItem, TimeData, Pedido } from '../entites/entities';
 //import { foodItemsContext } from "../App";
 import './FoorOrder.css';
 import ima from '../images/Hamburg.jpg';
 import logger from "../services/logging";
 import fetchData from "../services/FetchTime";
-import { db } from "../services/FirebaseStorage";
-import { push, ref } from "firebase/database";
+//import { db } from "../services/FirebaseStorage";
+//import { push, ref } from "firebase/database";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../features/store";
 import { actualizarCantidad } from "../features/sliceHamburguer";
+import { MenuItem, TimeData } from "../entites/entities";
 
 interface FoodOrderProps {
     food: number;
     onReturnToMenu: MouseEventHandler<HTMLButtonElement> | undefined;
 }
 function FoodOrder(props: FoodOrderProps) {
-    
+
 
 
     const dispatch = useDispatch<AppDispatch>();
@@ -29,7 +30,8 @@ function FoodOrder(props: FoodOrderProps) {
     const [selectquantity, setSelectQuantity] = useState(0);
 
     const menuItems = useSelector((state: RootState) => state.storeComidaRapida.items);
-    const foodG = useSelector((state: RootState) => state.storeComidaRapida.items[props.food-1]);
+    const { loading } = useSelector((state: RootState) => state.storeComidaRapida);
+    const foodG = useSelector((state: RootState) => state.storeComidaRapida.items[props.food - 1]);
     if (foodG.quantity <= 0) {
         throw new Error('Ya no quedan hamburguesas ' + foodG.name + ' ,tenemos ' + foodG.quantity + ' ahora mismo');
     }
@@ -42,16 +44,13 @@ function FoodOrder(props: FoodOrderProps) {
     const handleClick = async () => {
 
 
-        const itemEncontrado = menuItems.find((item: MenuItem) => item.id === foodG.id);
+        const itemEncontrado = menuItems?.find((item: MenuItem) => item.id === foodG.id);
 
         if (itemEncontrado) {
             try {
+                //AQUI AHORA SOLO SE TRAE LA FECHA ACTUAL
                 setTimeData(await fetchData(_timeZone, setTimeData, setisOrder));
-                const idd = itemEncontrado.id;
-                const quantity2 = itemEncontrado.quantity - quantity;
-                console.log("ANTES DEL DISPATCH");
-                dispatch(actualizarCantidad({ id: idd, quantity: quantity2 }));
-                console.log("DESPUES DEL DISPATCH");
+
 
 
             } catch (error) {
@@ -97,8 +96,8 @@ function FoodOrder(props: FoodOrderProps) {
         }
     };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const crearPedido = async () => {
+    // COMENTAMOS EL CREAR DESDE EL COMPONENTE
+    /*const crearPedido = async () => {
         let pedido: Pedido | null = null;
         pedido = {
             "fecha": timeData!.dateTime.toString(),
@@ -115,14 +114,18 @@ function FoodOrder(props: FoodOrderProps) {
             //logger.info("Aqui esta el nuevo pedido: " + pedido.id_menu + " " + pedido.nombre_menu + " " + pedido.fecha + " " + pedido.cantidad + " " + pedido.precio_total);
         }
         //setExcede(false);
-    }
+    }*/
 
 
+    // EL HOOK LANZAR EL DISPATCH UNA VEZ TENEMOS LA FECHA ACTUAL
     useEffect(() => {
-        if (isOrder === false && timeData) {
+        if (isOrder === false && timeData && loading == false) {
             async function realizarPedido() {
                 try {
-                    //await crearPedido();
+                    console.log("ANTES DEL DISPATCH");
+                    dispatch(actualizarCantidad({ menuItem: foodG, hora: timeData!.dateTime, cantidad: quantity }));
+                    console.log("DESPUES DEL DISPATCH");
+                    //await crearPedido(); //PARA GUARDAR EN FIREBASE
                     setExcede(false);
                 } catch (error) {
                     console.error('Error al crear pedido:', error);
@@ -130,7 +133,7 @@ function FoodOrder(props: FoodOrderProps) {
             }
             realizarPedido();
         }
-    }, [crearPedido, isOrder, timeData]);
+    }, [timeData]);
 
 
     return (
